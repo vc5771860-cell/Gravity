@@ -112,7 +112,7 @@ export default function Classroom() {
         myStreamRef.current = stream;
 
         // Replace track on all outgoing connections
-        const connections = peerRef.current.connections;
+        const connections = peerRef.current.connections as Record<string, any[]>;
         for (let peerId in connections) {
           connections[peerId].forEach((conn: any) => {
             if (conn.peerConnection) {
@@ -145,7 +145,7 @@ export default function Classroom() {
         }
 
         // Replace track on all outgoing connections
-        const connections = peerRef.current.connections;
+        const connections = peerRef.current.connections as Record<string, any[]>;
         for (let peerId in connections) {
           connections[peerId].forEach((conn: any) => {
             if (conn.peerConnection) {
