@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String         @id @default(cuid())
+  name        String
+  email       String         @unique
+  password    String
+  role        String         @default("STUDENT")
+  classes     ClassSession[] @relation("TeacherClasses")
+  scores      QuizScore[]
+  submissions Submission[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+
+
+model ClassSession {
+  id          String       @id @default(cuid())
+  title       String
+  teacher     User         @relation("TeacherClasses", fields: [teacherId], references: [id])
+  teacherId   String
+  startTime   DateTime
+  endTime     DateTime?
+  quizzes     Quiz[]
+  assignments Assignment[]
+  createdAt   DateTime     @default(now())
+}
+
+model Quiz {
+  id             String       @id @default(cuid())
+  title          String
+  classSession   ClassSession @relation(fields: [classSessionId], references: [id])
+  classSessionId String
+  questions      Question[]
+  scores         QuizScore[]
+  createdAt      DateTime     @default(now())
+}
+
+model Question {
+  id            String @id @default(cuid())
+  quiz          Quiz   @relation(fields: [quizId], references: [id])
+  quizId        String
+  text          String
+  options       String // JSON array of strings
+  correctOption Int
+}
+
+model QuizScore {
+  id        String   @id @default(cuid())
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    String
+  student   User     @relation(fields: [studentId], references: [id])
+  studentId String
+  score     Int
+  createdAt DateTime @default(now())
+}
+
+model Assignment {
+  id             String       @id @default(cuid())
+  title          String
+  description    String
+  dueDate        DateTime
+  classSession   ClassSession @relation(fields: [classSessionId], references: [id])
+  classSessionId String
+  submissions    Submission[]
+  createdAt      DateTime     @default(now())
+}
+
+model Submission {
+  id           String     @id @default(cuid())
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String
+  student      User       @relation(fields: [studentId], references: [id])
+  studentId    String
+  content      String     // Link or text content
+  grade        Int?
+  submittedAt  DateTime   @default(now())
+}
